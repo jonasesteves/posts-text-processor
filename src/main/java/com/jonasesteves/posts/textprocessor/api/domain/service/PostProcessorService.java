@@ -2,16 +2,19 @@ package com.jonasesteves.posts.textprocessor.api.domain.service;
 
 import com.jonasesteves.posts.textprocessor.api.domain.model.PostData;
 import com.jonasesteves.posts.textprocessor.api.domain.model.PostDataResponse;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
+@Service
 public class PostProcessorService {
 
-    private static final BigDecimal PRICE_PER_WORD = new BigDecimal("0.01");
+    private static final BigDecimal PRICE_PER_WORD = new BigDecimal("0.10");
 
     public PostDataResponse calculateValue(PostData postData) {
+        Objects.requireNonNull(postData);
 
-        // TODO: tratar erro aqui, possível entrada de valor nulo.
         String[] words = postData.getPostBody().trim().split("\\s+");
         int wordCount = words.length;
 

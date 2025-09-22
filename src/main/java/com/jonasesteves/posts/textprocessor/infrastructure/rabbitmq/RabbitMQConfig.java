@@ -8,6 +8,9 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class RabbitMQConfig {
 
@@ -22,8 +25,15 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue queuePostProcess() {
-        return QueueBuilder.durable(QUEUE_PROCESS_POST).build();
-        // TODO: Criar a queue dead letter para onde vai ser direcionado caso dê erro nesta queue.
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", "");
+        args.put("x-dead-letter-routing-key", DEAD_LETTER_QUEUE_PROCESS_POST);
+        return QueueBuilder.durable(QUEUE_PROCESS_POST).withArguments(args).build();
+    }
+
+    @Bean
+    public Queue deadLetterQueueProcessPost() {
+        return QueueBuilder.durable(DEAD_LETTER_QUEUE_PROCESS_POST).build();
     }
 
     @Bean
@@ -32,7 +42,7 @@ public class RabbitMQConfig {
     }
 
     private FanoutExchange exchange() {
-        return ExchangeBuilder.fanoutExchange("post-text-processor.post-received.v1.e").build();
+        return ExchangeBuilder.fanoutExchange("posts-service.post-created.v1.e").build();
     }
 
     @Bean
